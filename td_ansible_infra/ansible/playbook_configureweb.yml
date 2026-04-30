@@ -1,0 +1,32 @@
+
+
+- name: Installation et configuration du serveur web Apache
+  hosts: web
+  gather_facts: yes
+  become: yes
+
+  tasks:
+
+    - name: Mise à jour du cache apt (apt update)
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Installation du paquet apache2
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+
+    - name: Copie du contenu local site_web/ dans /var/www/html/
+      ansible.builtin.copy:
+        src: files/site_web/
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Activation et redémarrage du service apache2
+      ansible.builtin.systemd:
+        name: apache2
+        enabled: yes
+        state: restarted

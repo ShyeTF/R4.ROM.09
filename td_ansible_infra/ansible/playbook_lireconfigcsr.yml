@@ -1,0 +1,18 @@
+
+
+- name: Acte 1 - Lecture de la configuration du CSR1000
+  hosts: csr1000
+  gather_facts: false
+
+  tasks:
+
+    - name: Récupère la configuration courante (running-config)
+      cisco.ios.ios_command:
+        commands: show running-config
+      register: config
+
+    - name: Enregistre la configuration dans un fichier local
+      ansible.builtin.copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "show_run_{{ inventory_hostname }}.txt"
+      delegate_to: localhost
